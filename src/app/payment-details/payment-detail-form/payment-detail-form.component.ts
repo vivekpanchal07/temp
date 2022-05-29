@@ -11,27 +11,52 @@ import { PaymentDetailService } from 'src/app/shared/payment-detail.service';
 })
 export class PaymentDetailFormComponent implements OnInit {
 
-  constructor(public service:PaymentDetailService , private toastr:ToastrService) { }
+  constructor(public service: PaymentDetailService, private toastr: ToastrService) { }
 
   ngOnInit(): void {
   }
 
-  onSubmit(form:NgForm){
+  onSubmit(form: NgForm) {
+    if (this.service.formData.paymentDetailId == null) {
+      this.insertRecord(form);
+    } else {
+      this.updateRecord(form);
+    }
+  }
+
+  insertRecord(form: NgForm) {
     this.service.postPaymentDetail().subscribe(
-      res => { 
-        this.resetForm(form);  
-        this.toastr.success('Submitted Succesfully','Payment Detail Register ');
+      res => {
+        this.resetForm(form);
+        this.service.refreshlist();
+        this.toastr.success('Submitted Succesfully', 'Payment Detail Register ');
       },
       err => {
         console.log(err);
       }
-      
+
     );
   }
 
-  resetForm(form:NgForm){
+  updateRecord(form: NgForm) {
+    this.service.putPaymentDetail().subscribe(
+      res => {
+        this.resetForm(form);
+        this.service.refreshlist();
+        this.toastr.info('Updated Succesfully', 'Payment Detail Register ');
+      },
+      err => {
+        console.log(err);
+      }
+
+    );
+  }
+
+  resetForm(form: NgForm) {
     form.form.reset();
     this.service.formData = new PaymentDetail();
   }
+
+
 
 }
